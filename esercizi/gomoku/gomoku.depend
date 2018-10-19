@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1538652452 source:/home/nicola/Scrivania/gomoku/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
