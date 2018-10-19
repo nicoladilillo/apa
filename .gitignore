@@ -1,0 +1,5 @@
+*.pdf
+**/**/cmake-build-debug/
+**/**/bin/
+**/**/obj/
+**/**/.idea/
