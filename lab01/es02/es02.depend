@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1538947796 source:/home/nicola/Scrivania/lab01/es02/main.c
+	<stdio.h>
+	<stdlib.h>
+
+1539013665 source:/home/nicola/Scrivania/A.P.A/Lab/lab01/es02/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+

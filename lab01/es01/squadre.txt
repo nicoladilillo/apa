@@ -1,0 +1,3 @@
+juve 3 0 1
+roma 3 0 1
+milan 1 1 1
