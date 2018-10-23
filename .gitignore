@@ -1,5 +1,8 @@
-*.pdf
+AP1819_RegoleLab.pdf
 **/**/cmake-build-debug/
 **/**/bin/
 **/**/obj/
 **/**/.idea/
+**/**/*.cbp
+**/**/*.depend
+**/**/*.layout
