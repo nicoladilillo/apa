@@ -4,21 +4,12 @@
 #define N 50
 #define M 3
 
-/*
-*   questa struttura ci sarà utile per gestire la nostra stampa
-*/
-typedef struct posizione {
-    int n[2];
-    int t[M];
-} Posizioni;
-
-void cerca(int m[][N], int righe, int colonne, Posizioni p[]);
-void controllo(int base, int altezza, Posizioni p[], int x, int y);
-void posizione_iniziale(Posizioni c[], int x, int y, int base, int altezza, int i);
+void cerca(int m[][N], int righe, int colonne);
+void posizione_iniziale(int x, int y, int base, int altezza);
 
 /*
 *   Tramite questa funzione leggiamo la nostra matrice da file attraverso
-*   l'utilizzo di puntatori, grazie ai quali assumiamo anche i nostri
+*   l'utilizzo di puntatori, grazie ai quali assumiamo anche r nostri
 *   valori di righe e colonne della matrice
 */
 void leggi_matrice(int v[][N], int *righe, int *colonne, char nomefile[])
@@ -28,7 +19,7 @@ void leggi_matrice(int v[][N], int *righe, int *colonne, char nomefile[])
     if (fp == NULL)
     {
         printf("Errore accesso al file!\n");
-        return -2;
+        exit(-2);
     }
 
     int i, j;
@@ -41,7 +32,7 @@ void leggi_matrice(int v[][N], int *righe, int *colonne, char nomefile[])
 }
 
 /*
-*   Stampa la matrice letta
+*   Stampa la matrice letta con formattazione output
 */
 void stampa_matrice(int m[N][N], int righe, int colonne)
 {
@@ -49,44 +40,18 @@ void stampa_matrice(int m[N][N], int righe, int colonne)
 
     printf("Righe: %d\t Colonne: %d\n\n", righe, colonne);
 
+    printf("      ");
+    for (i = 0; i < colonne; i++)
+        printf("%d ", i+1);
+    printf("\n\n");
+
     for (i = 0; i < righe; i++)
     {
+        printf("%2d    ", i+1);
         for (j = 0; j < colonne; j++)
             printf("%d ", m[i][j]);
         printf("\n");
     }
-}
-
-void stampa(Posizioni p[])
-{
-    int i;
-
-    for(i = 0; i < M; i++) {
-        printf("Max ");
-        switch (i)
-        {
-            case 0:
-                printf("Base: ");
-                break;
-            case 1:
-                printf("Altezza: ");
-                break;
-            case 2:
-                printf("Aerea: ");
-                break;
-        }
-        printf("estr. sup. SX=<%d,%d> b = %d, h = %d, Area = %d\n",
-               p[i].n[0], p[i].n[1], p[i].t[0], p[i].t[1], p[i].t[2]);
-    }
-
-}
-
-void azzera(Posizioni m[])
-{
-    int i, j;
-    for (i = 0; i < M; i++)
-        for (j = 0; j < M; j++)
-            m[i].t[j] = 0;
 }
 
 int main(int argc, char *argv[])
@@ -98,100 +63,88 @@ int main(int argc, char *argv[])
     }
     int m[N][N];
     int nr, nc;
-    Posizioni p[M]; // posizioni di base, altezza e area
 
     clock_t start = clock();
-
-    azzera(p);
 
     leggi_matrice(m, &nr, &nc, argv[1]);
     stampa_matrice(m, nr, nc);
 
-    cerca(m, nr, nc, p);
-    stampa(p);
-
-    clock_t stop = clock();
-    double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
-    printf("\nTime elapsed: %.5f\n", elapsed);
+    cerca(m, nr, nc);
 
     return 0;
 }
 
+int riconosciRegione(int m[][N], int nr, int nc, int righe, int *colonne, int *h, int *b)
+{
+    int flag = 2, z;
+
+    if (m[righe][*colonne] == 1) {
+        // calcolo altezza
+        /*
+        * con questo if controllo se la riga successiva possiede una sequenza di 1,
+        * così incremento la base, o se quella precedente contiene già un uno, in questo
+        * non faccio nulla, un controllo è già stato eseguito
+        */
+        if (righe == 0 || (righe > 0 && m[righe-1][*colonne] != 1)) {
+            *h = 1;
+            flag = 1;
+            for (z = righe+1; z < nr && flag; z++) {
+                if (m[z][*colonne] != 1)
+                    flag = 0;
+                else
+                    (*h)++;
+            }
+
+            // calcolo base solo se abbiamo trovato un valore dell'altezza
+            if (*colonne == 0 || (*colonne > 0 && m[righe][*colonne - 1] != 1)) {
+                *b = 1;
+                flag = 1;
+                for (*colonne = *colonne + 1; *colonne < nc && flag; (*colonne)++) {
+                    if (m[righe][*colonne] != 1) {
+                        flag = 0;
+                        (*colonne)--;
+                    } else
+                        (*b)++;
+                }
+            }
+        }
+
+    }
+
+    /*
+     * se il flag è diverso a due vuol dire che abbiamo eseguito dei controlli e il valore
+     * del flag è sicuramente camabiato, altrimenti potremmo aver analizzato una cella
+     * contenente uno zero o una cella di una regione già stampata precedentemente
+     */
+    if (flag != 2)
+        return 1;
+    else
+        return 0;
+}
+
 /*
-*   tramite questa funzione cerchiamo i nostri rettangoli con
+*   tramite questa funzione cerchiamo r nostri rettangoli con
 *   altezza, base o area maggiore
 */
-void cerca(int m[][N], int righe, int colonne, Posizioni p[])
+void cerca(int m[][N], int righe, int colonne)
 {
-    int i, j, k, z;
-    int flag, b, h;
+    int i, j;
+    int h, b;
 
     for (i = 0; i < righe; i++) {
         for (j = 0; j < colonne; j++) {
-            if (m[i][j] == 1) {
-
-                // calcolo altezza
+            /*
+             * passo il valore delle colonne (j) perchè non avrò bisogno di controllare
+             * le colonne successive a quelle dell'estremo controllato
+             */
+            if (riconosciRegione(m, righe, colonne, i, &j, &h, &b))
                 /*
-                * con questo if controllo se la riga successiva possiede una sequenza di 1,
-                * così incremento la base, o se quella precedente contiene già un uno, in questo
-                * non faccio nulla, un controllo è già stato eseguito
-                */
-                if (i == 0 || (i > 0 && m[i-1][j] != 1)) {
-                    h = 1;
-                    flag = 0;
-                    for (z = i+1; z < righe && flag == 0; z++) {
-                        if (m[z][j] != 1)
-                            flag = 1;
-                        else
-                            h++;
-                    }
-                }
-
-
-                // calcolo base
-                if(j == 0 || (j > 0 && m[i][j-1] != 1)) {
-                    b = 1;
-                    flag = 0;
-                    for (j = j+1; j < colonne && flag == 0; j++) {
-                        if (m[i][j] != 1)
-                            flag = 1;
-                        else
-                            b++;
-                    }
-                }
-
-                controllo(b, h, p, j, i);
-            }
+                 * 1) Ho aggiunto 1 a ogni estremo perchè volevo dare una visuale più realistica
+                 * 2) incrementanto il contatore delle colonne (j) all'interno della funzione per la visualizzazione
+                 *      della cella iniziale devo sottrarre la base
+                 */
+                printf("Estremo <%d,%d> di base %d e altezza %d\n", i+1, j+1-b,  b, h);
         }
     }
 
-}
-
-/*
-*   in p[0] avremo la base
-*   in p[1] avremo l'altezza
-*   in p[2] avremo l'aerea
-*/
-void controllo(int base, int altezza, Posizioni p[], int x, int y)
-{
-    if(base > p[0].t[0]) {
-        posizione_iniziale(p, x, y, base, altezza, 0);
-    }
-
-    if(altezza > p[1].t[1]) {
-        posizione_iniziale(p, x, y, base, altezza, 1);
-    }
-
-    if(base*altezza > p[2].t[2]) {
-        posizione_iniziale(p, x, y, base, altezza, 2);
-    }
-}
-
-void posizione_iniziale(Posizioni c[], int x, int y, int base, int altezza, int i)
-{
-    c[i].n[0] = y; // riga
-    c[i].n[1] = x-base; // colonna
-    c[i].t[0] = base;
-    c[i].t[1] = altezza;
-    c[i].t[2] = base*altezza;
 }
