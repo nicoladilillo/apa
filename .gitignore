@@ -3,7 +3,6 @@ AP1819_RegoleLab.pdf
 **/**/bin/
 **/**/obj/
 **/**/.idea/
-*
-!*.cbp
-!*.depend
-!*.layout
+*.cbp
+*.depend
+*.layout
