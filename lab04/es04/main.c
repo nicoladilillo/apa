@@ -208,7 +208,54 @@ void ordina(Riga v[], int n, int **f)
         return;
     }
 
+}
 
+int ricercadicotomica(Riga m[], int r, char cmd[])
+{
+    int q;
+    int l = 0;
+
+    while (l <= r)
+    {
+        q = (l+r)/2;
+        if (strcmp(m[q].p, cmd) == 0)
+            return q;
+        if (strcmp(m[q].p, cmd) < 0)
+            l = q+1;
+        else
+            r = q-1;
+    }
+
+    return -1;
+}
+
+int ricercalineare(Riga m[], int n, char cmd[])
+{
+    int i;
+    for (i = 0; i < n; i++) {
+        if (strcmp(m[i].p, cmd) == 0)
+            return i;
+    }
+
+    return -1;
+}
+
+void ricercapartenza(Riga v[], int n, int f)
+{
+    char tratta[M];
+    int app;
+
+    printf("Inserire partenza di una tratta: ");
+    scanf("%s", tratta);
+    if (f == 2)
+        app = ricercadicotomica(v, n, tratta);
+    else
+        app=  ricercalineare(v, n, tratta);
+
+    if (app == -1)
+        errore();
+    else
+        stampa(stdout, &v[app], 1);
 }
 
 void selezionaDati(Riga v[], int n, comando_e c, int *f)
@@ -221,12 +268,13 @@ void selezionaDati(Riga v[], int n, comando_e c, int *f)
             ordina(v, n, &f);
             break;
         case ricerca:
+            ricercapartenza(v, n, *f);
             break;
         case fine:
             printf("Uscita\n");
             *f = 1;
             break;
         case err:
-        default: printf("comando errato\n");
+        default: errore();
     }
 }
