@@ -55,7 +55,7 @@ void leggi_matrice(Riga d[], int *r, char nome[])
     fp = fopen(nome, "r");
     if(fp == NULL) {
         printf("Errore lettura file\n");
-        return -1;
+        exit(-1);
     }
 
     fscanf(fp,"%d\n", r);
