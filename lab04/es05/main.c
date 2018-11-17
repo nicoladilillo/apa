@@ -5,12 +5,13 @@
 
 #define M 31 // lunghezza massima stringa + tappo
 #define N 1000 // numero massimo di righe
-#define R 3 // data - codice - partenze -> 3 tipi di chiavi
+#define R 4 // data - codice - partenze - arrivi -> 4 tipi di chiavi
 #define VIDEO "video"
 #define FIL "file"
 #define DATA "data"
 #define CODICE "codice"
 #define PARTENZA "partenza"
+#define  ARRIVO "arrivo"
 
 #define NAME "log.txt"
 
@@ -110,9 +111,10 @@ void selezionaDati(Riga v[], int n, comando_e c, int *f, Riga *(*p)[][N]);
  */
 void azzera(Riga *d, Riga *(*m)[][N], int n)
 {
-    int i;
-    for (i = 0; i < n; i++)
-        (*m)[0][i] = (*m)[1][i] = (*m)[2][i] = &d[i];
+    int i, j;
+    for (i = 0; i < R; i++)
+        for (j = 0; j < n; j++)
+            (*m)[i][j] = &d[j];
 }
 
 int main(int argc, char *argv[])
@@ -120,14 +122,15 @@ int main(int argc, char *argv[])
     char nomefile[] = "corse.txt"; // nome file sempre uguale
 
     Riga d[N];
-    int r, flag = 4;
+    int r, flag = 5;
     /*
      * il nostro flag avrà 4 valore:
      * - 0 se ordinamento su view data
      * - 1 se ordinamento su view codice
      * - 2 se ordinamento su view partenza
-     * - 3 se dobbiamo concludere il nostro ciclo while di assimilazione comandi
-     * - 4 se non abbiamo ancora ordinato il nostro vettore
+     * - 3 se ordinamento su view arrivi
+     * - 4 se dobbiamo concludere il nostro ciclo while di assimilazione comandi
+     * - 5 se non abbiamo ancora ordinato il nostro vettore
      */
 
     Riga *p[R][N]; // numero di ordinamenti
@@ -137,6 +140,7 @@ int main(int argc, char *argv[])
      * - p[0] è la view di ordinamento per data
      * - p[1] è la view di ordinamento per codice
      * - p[2] è la view di ordinamento per partenza
+     * - p[3] è la view di ordinamento per arrivi
      */
 
     leggi_matrice(d, &r, nomefile);
@@ -149,7 +153,7 @@ int main(int argc, char *argv[])
 
     comando_e comando;
 
-    while(flag != 3) {
+    while(flag != 4) {
         comando = leggi_comando();
         selezionaDati(d, r, comando, &flag, p) ;
     }
@@ -173,7 +177,7 @@ void stampa(FILE *file, Riga *d, int n, int f, Riga  *(*p)[][N]) {
      * ordinamento in base alla chiave altrimenti stampiamo un semplice
      * vettore di valori e non di puntatori
      */
-    if (f == 4)
+    if (f == R+1)
     {
         for (i = 0; i < n; i++)
             fprintf(file, "%s %s %s %s %s %s %d\n", d[i].c, d[i].p, d[i].de,
@@ -237,6 +241,11 @@ int confrontopartenza (const Riga * a, const Riga * b)
     return strcmp(a->p, b->p);
 }
 
+int confrontoarrivo (const Riga * a, const Riga * b)
+{
+    return strcmp(a->de, b->de);
+}
+
 /*
  * esegue il cambio dei nostri valori
  * in modo da ordinarli
@@ -254,7 +263,7 @@ void swap(Riga *(*p)[][N], int i, int j, int f)
  * non ordineremo il vettore creeremo delle view ordinate del vettore
  * tramite vettori di puntatore di tipo Riga (nel nostro caso una matrice di puntatori)
  */
-void ordina_vettore (Riga v[], int n, int (*comp)(const Riga*,const Riga*), Riga *(*p)[][N], int f)
+void ordina_vettore (int n, int (*comp)(const Riga*,const Riga*), Riga *(*p)[][N], int f)
 {
     int i, j, m;
     for (i = 0; i < n-1; i++) {
@@ -267,6 +276,9 @@ void ordina_vettore (Riga v[], int n, int (*comp)(const Riga*,const Riga*), Riga
             if (comp((*p)[f][m], (*p)[f][j]) > 0)
                 m = j;
         }
+        /*
+         * trova il valore minimo da cambiare
+         */
         if (i != m)
             swap(p, i, m, f);
      }
@@ -275,10 +287,10 @@ void ordina_vettore (Riga v[], int n, int (*comp)(const Riga*,const Riga*), Riga
 /*
  * scegliamo il tipo di ordinamento da effettuare
  */
-void ordina(Riga v[], int n, int **f,  Riga *(*p)[][N])
+void ordina(int n, int **f,  Riga *(*p)[][N])
 {
     char cmd[M];
-    printf("%s/%s/%s? ", DATA, CODICE, PARTENZA);
+    printf("%s/%s/%s/%s? ", DATA, CODICE, PARTENZA, ARRIVO);
     scanf("%s", cmd);
 
     /*
@@ -287,13 +299,16 @@ void ordina(Riga v[], int n, int **f,  Riga *(*p)[][N])
      */
     if (strcmp(cmd, DATA) == 0) {
         **f = 0;
-        ordina_vettore(v, n, confrontodata, p, **f);
+        ordina_vettore(n, confrontodata, p, **f);
     } else if (strcmp(cmd, CODICE) == 0) {
         **f = 1;
-        ordina_vettore(v, n, confrontocodice, p, **f);
+        ordina_vettore(n, confrontocodice, p, **f);
     } else if (strcmp(cmd, PARTENZA) == 0) {
         **f = 2;
-        ordina_vettore(v, n, confrontopartenza, p, **f);
+        ordina_vettore(n, confrontopartenza, p, **f);
+    } else if (strcmp(cmd, ARRIVO) == 0) {
+        **f = 3;
+        ordina_vettore(n, confrontoarrivo, p, **f);
     } else {
         errore();
         return;
@@ -307,11 +322,27 @@ void ordina(Riga v[], int n, int **f,  Riga *(*p)[][N])
  */
 
 /*
+ * ricerca se il nome della città è scritto anche solo in parte
+ */
+int ricerca_parziale(char *str,char *str2)
+{
+    while (*str2 != '\0') {
+        if (*str == '\0' || *str != *str2)
+            return -1;
+        else {
+            str2++; str++;
+        }
+    }
+
+    return 0;
+}
+
+/*
  * ricerca che ha complessità log(n) ma può essere utilizzata
  * solo se il nostro vettore è ordinato secondo la
  * nostra chiave di ricerca
  */
-int ricercadicotomica(int r, char cmd[],  Riga *p[][N])
+Riga *ricercadicotomica(int r, char cmd[],  Riga *(*p)[][N])
 {
     int f = 2;
     int q;
@@ -320,9 +351,9 @@ int ricercadicotomica(int r, char cmd[],  Riga *p[][N])
     while (l <= r)
     {
         q = (l+r)/2;
-        if (strcmp(p[f][q]->p, cmd) == 0)
-            return q; // trovato valore nella posizione q
-        if (strcmp(p[f][q]->p, cmd) < 0)
+        if (ricerca_parziale((*(*p)[f][q]).p, cmd) == 0)
+            return &(*(*p)[f][q]); // trovato valore nella posizione q
+        if (strcmp((*(*p)[f][q]).p, cmd) < 0)
             l = q+1; // ricerca nel sottovettore destro
         else
             r = q-1; // ricerca nel sottovettore sinistro
@@ -331,25 +362,25 @@ int ricercadicotomica(int r, char cmd[],  Riga *p[][N])
     /*
      * ritorna meno uno in caso di fallita ricerca
      */
-    return -1;
+    return NULL;
 }
 
 /*
  * normale ricerca che controlla i dati uno
  * alla volta da sinstra a destra
  */
-int ricercalineare(Riga m[], int n, char cmd[])
+Riga *ricercalineare(Riga m[], int n, char cmd[])
 {
     int i;
     for (i = 0; i < n; i++) {
-        if (strcmp(m[i].p, cmd) == 0)
-            return i; // ritorna posizione valore trovato
+        if (ricerca_parziale(m[i].p, cmd) == 0)
+            return &m[i]; // ritorna posizione valore trovato
     }
 
     /*
      * ritorna meno uno in caso di fallita ricerca
      */
-    return -1;
+    return NULL;
 }
 
 /*
@@ -358,7 +389,7 @@ int ricercalineare(Riga m[], int n, char cmd[])
 void ricercapartenza(Riga v[], int n, int f,  Riga *(*p)[][N])
 {
     char tratta[M];
-    int app;
+    Riga *app;
 
     printf("Inserire partenza di una tratta: ");
     scanf("%s", tratta);
@@ -378,16 +409,16 @@ void ricercapartenza(Riga v[], int n, int f,  Riga *(*p)[][N])
      * se il nostro indice di ritorno è -1 vuol
      * dire che il valore cerato non esiste
      */
-    if (app == -1)
+    if (app == NULL)
         errore();
     else
         /*
          * - stdout stampa a video
-         * - &v[app] stampa il nostro valore cercato
+         * - app stampa il nostro valore cercato
          * - 1 perchè stampiamo un solo elemento
          * - 4 perchè effettuiamo una stampa non con i puntatori
          */
-        stampa(stdout, &v[app], 1, 4, p);
+        stampa(stdout, app, 1, R+1, p);
 }
 
 /**
@@ -404,14 +435,14 @@ void selezionaDati(Riga v[], int n, comando_e c, int *f,  Riga *(*p)[][N])
             stampa_matrice(v, n, *f, p);
             break;
         case ordinamento:
-            ordina(v, n, &f, p);
+            ordina(n, &f, p);
             break;
         case ricerca:
             ricercapartenza(v, n, *f, p);
             break;
         case fine:
             printf("Uscita\n");
-            *f = 3;
+            *f = R;
             break;
         case err:
         default: errore();
