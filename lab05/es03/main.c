@@ -197,6 +197,8 @@ int main(int argc, char *argv[])
         comando = leggi_comando();
         selezionaDati(&d, &r, comando, &flag, p) ;
     }
+
+    return 0;
 }
 
 
