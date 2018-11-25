@@ -93,7 +93,7 @@ void leggi_matrice(Riga **d, int *r, char nome[])
     int i;
     for (i = 0; i < *r; i++) {
         fscanf(fp, "%s %s %s %s %s %s %d\n", (*d)[i].c, (*d)[i].p, (*d)[i].de, (*d)[i].da,
-                (*d)[i].o_p, (*d)[i].p_a, &(*d)[i].r);
+               (*d)[i].o_p, (*d)[i].p_a, &(*d)[i].r);
     }
 
     fclose(fp);

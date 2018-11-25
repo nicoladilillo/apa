@@ -78,11 +78,6 @@ int **malloc2dR(char *nome, int *r, int *c)
  */
 void separa(int **mat, int nr, int nc, int **b, int **n, int *nb, int *nn)
 {
-    /*
-     * calcolo numero elementi bianchi e neri
-     */
-    *nn = (nr * nc)/2;
-    *nb = (nr * nc) - *nn;
 
     /*
      * allocazione dinamica dei nostri vettori
@@ -106,7 +101,7 @@ void separa(int **mat, int nr, int nc, int **b, int **n, int *nb, int *nn)
 
         for (j = 0; j < nc; j++) {
             if (flag_c == 0) {
-                (*b)[i+j/2] = mat[i][j];
+                (*b)[cnt_b] = mat[i][j];
                 cnt_b++;
                 flag_c = 1;
             } else {
@@ -121,6 +116,9 @@ void separa(int **mat, int nr, int nc, int **b, int **n, int *nb, int *nn)
         else
             flag_r = 0;
     }
+
+    *nb = cnt_b;
+    *nn = cnt_n;
 }
 
 void stampa(int *x, int n)
@@ -129,6 +127,14 @@ void stampa(int *x, int n)
     for (i = 0; i < n; i++)
         printf("%d ", *(x+i));
     printf("\n");
+}
+
+void disalloca_matrice(int **m, int r)
+{
+    int i;
+    for (i = 0; i < r; i++)
+        free(m[i]);
+    free(m);
 }
 
 int main(int argc, char *argv[])
@@ -154,6 +160,7 @@ int main(int argc, char *argv[])
 
     free(bianchi);
     free(neri);
+    disalloca_matrice(x, nr);
 
     return 0;
 }

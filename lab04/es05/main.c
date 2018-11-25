@@ -109,12 +109,14 @@ void selezionaDati(Riga v[], int n, comando_e c, int *f, Riga *(*p)[][N]);
  * assegna valore indirizzo iniziale delle view tale da
  * avere una view con la stessa sequenza inizale di dati
  */
-void azzera(Riga *d, Riga *(*m)[][N], int n)
+void azzera(Riga *d, Riga ***m, int n)
 {
     int i, j;
+    Riga ***tmp = *m;
     for (i = 0; i < R; i++)
         for (j = 0; j < n; j++)
-            (*m)[i][j] = &d[j];
+            (m)[i][j] = &d[j];
+
 }
 
 int main(int argc, char *argv[])

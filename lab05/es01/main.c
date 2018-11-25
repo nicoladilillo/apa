@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <printf.h>
 
-#define N 100
+#define N 5 // numero massimo di canzoni da poter scegliere
 #define C 255
 #define FIL "brani.txt"
 
@@ -41,6 +41,10 @@ int apri_file(Ragazzo v[], char nome[], int g[])
     return n;
 }
 
+/*
+ * il vettore p[] contiene in ordine di ragazzo
+ * l'indice della canzone da stampare
+ */
 void stampa(Ragazzo r[], int n, int p[])
 {
     int i;
@@ -55,10 +59,17 @@ int esplorasoluzioni(Ragazzo r[], int n, int start, int v[], int c)
     int i;
 
     if (start == n) {
+        /*
+         * stampiamo la nostra combinazione semplice ottenuta
+         */
         stampa(r, n, v);
         return c+1;
     } else {
         for (i = 0; i < r[start].n; i++) {
+            /*
+             * salviamo una canzone per ogni ragazzo;
+             * ovvero l'indice della canzone
+             */
             v[start] = i;
             c = esplorasoluzioni(r, n, start + 1, v, c);
         }
