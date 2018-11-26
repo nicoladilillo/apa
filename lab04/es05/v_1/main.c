@@ -109,13 +109,13 @@ void selezionaDati(Riga v[], int n, comando_e c, int *f, Riga *(*p)[][N]);
  * assegna valore indirizzo iniziale delle view tale da
  * avere una view con la stessa sequenza inizale di dati
  */
-void azzera(Riga *d, Riga ***m, int n)
+void azzera(Riga *d, Riga *(*m)[][N], int n)
 {
     int i, j;
     Riga ***tmp = *m;
     for (i = 0; i < R; i++)
         for (j = 0; j < n; j++)
-            (m)[i][j] = &d[j];
+            (*m)[i][j] = &d[j];
 
 }
 
@@ -204,7 +204,7 @@ void stampa_matrice(Riga d[], int r, int f, Riga **v[])
     if (strcmp(cmd, VIDEO) == 0)
         fp = stdout;
     else if (strcmp(cmd, FIL) == 0)
-        fp = fopen(NAME, "w+");
+        fp = fopen(NAME, "w");
     else {
         errore();
         return;
@@ -215,7 +215,9 @@ void stampa_matrice(Riga d[], int r, int f, Riga **v[])
      * facendo fclose non potrei più
      * utilizzare printf
      */
-    //fclose(fp);
+
+    if (fp != stdout)
+        fclose(fp);
 }
 
 
