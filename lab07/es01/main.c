@@ -63,15 +63,16 @@ void swap(int *cnt, int *f, int pos, int *c)
 int promising(int *collana, int pos, int *finale, int *cnt)
 {
     /*
-     * dobbiaom dire se il precedente a quello puntato da pos
-     * e seguito da un valore che rispetta un certo criterio
+     * dobbiamo dire se il valore precedente a quello puntato
+     * da pos sia seguito da un valore che rispetta un certo criterio
      */
     int c = collana[pos-1];
 
+
     /*
-     * valutiamo se le nostre condizioni ripsettano le condizioni
-     * citate in testa alla funzone per costruire la collana
-     */
+    * valutiamo se la nostra combinazione mentre viene creata ripsetti
+    * le condizioni citate in testa alla funzone per costruire la collana
+    */
     switch (c) {
         case zaffiri:
             if (collana[pos] != zaffiri && collana[pos] != rubini)
@@ -89,60 +90,70 @@ int promising(int *collana, int pos, int *finale, int *cnt)
             if (collana[pos] != zaffiri && collana[pos] != rubini)
                 return 0;
             break;
-        default: exit(-2);
+        default:
+            exit(-2);
     }
 
     /*
-     * se siamo arrivati qua dobbiamo controllare che il nostro nuovo contatore
-     * sia maggiore di quello vecchio
-     */
+    * se siamo arrivati qua dobbiamo controllare che il nostro nuovo contatore sia
+    * maggiore di quello vecchio e nel caso sostituira i valori della combinazione finale
+    */
     if (pos+1 > *cnt)
         swap(cnt, finale, pos+1, collana);
 
     return 1;
 }
 
-void powerset(int *p, int pos, int *collana, int max, int *cnt, int *f)
+/*
+ * funzione di ricorsiva che aggiorna, se trova valori migliori, la lunghezza massima
+ * della combinazione creata e la combinazione stessa
+ */
+void powerset(int *occ, int pos, int *collana, int max, int *cnt, int *f)
 {
     int i;
 
     /*
-     * terminazione, sono stati collocati tutti gli elementi
+     * condizione di terminazione che non ci fa iniziare nessuna delle nostre
+     * chiamate ricorsive se abbiamo trovato una combinazione
+     * pietre che possiede lunghezza massima, altrimenti si continua ad effettuare
+     * chiamate ricorsive fin quando non si trova una combinazione tale da avere
+     * la lunghezza massim a di pietre possibili da sistemare
      */
-    /*if (pos >= max) {
-        stampa(collana, max);
+    if (*cnt == max)
         return;
-    }*/
 
     /*
      * - ricorsione per ottenere disposizini ripetute
      * - promising per controllare se stiamo procedendo nella giusta direzione
-     *   controllando la mossa precedente, pos-1
+     *   controllando la mossa precedente, pos-1 perchè nella posizione pos non
+     *   abiamo inserito ancora nessun valore
      */
     if (pos <=1  || promising(collana, pos-1, f, cnt)) {
+        /*
+         * per avere una ripetizione su tutti i possibili valori da inserire
+         */
         for (i = 0; i < pietre; i++)
             /*
-             * la parte iniziale del for serve per avere una ripetizione su
-             * tutti i possibili valori da inserire
+             * inseriamo un elemento solo se sono ancora disponibile una delle sue occorrenze
              */
-            if (p[i] > 0) {
+            if (occ[i] > 0) {
                 /*
                  * inseriamo il nostro valore nella lista
                  */
                 collana[pos] = i;
                 /*
-                 * decrementiamo il numero di valori di una data pietra
+                 * decrementiamo il numero di valori di una data pietra dal vettore delle occorrenze
                  */
-                p[i]--;
+                occ[i]--;
                 /*
                  * chiamata ricorsiva
                  */
-                powerset(p, pos + 1, collana, max, cnt, f);
+                powerset(occ, pos + 1, collana, max, cnt, f);
                 /*
                  * incrementiamo nuovamente il valore di una data pietra per poterla
                  * utilzzare in una prossima chiamata in una diversa posizione
                  */
-                p[i]++;
+                occ[i]++;
             }
     }
 
