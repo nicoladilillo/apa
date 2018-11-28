@@ -478,18 +478,17 @@ link operazione_cancella(link *h)
     if (h == NULL)
         printf("Lista vuota!\n");
     else {
-        /*
-         * confronto del primo valore
-        */
-        if (strcmp((*h)->v.codice, codice) == 0) {
-            x = *h;
-            *h = x->next;
-            return x;
-        }
 
-        for (app = *h, x = app->next; x != NULL; app = x, x = x->next) {
+        for (app = NULL, x = *h; x != NULL; app = x, x = x->next) {
             if (strcmp(x->v.codice, codice) == 0) {
-                app->next = x->next;
+                /*
+                 * modifica head
+                 */
+                if (x == *h)
+                    *h = x->next;
+                else
+                    app->next = x->next;
+
                 return x;
             }
         }
