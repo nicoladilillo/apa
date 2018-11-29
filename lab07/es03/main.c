@@ -116,7 +116,7 @@ int apri_file(FILE **fp)
     scanf("%s", nome);
 
     *fp = NULL;
-    *fp = fopen(str, "r");
+    *fp = fopen(nome, "r");
     if (*fp == NULL) {
         errore_comando("apertura file");
         return 0;
@@ -131,24 +131,32 @@ int apri_file(FILE **fp)
 int controllo_codice(char *cod, link x)
 {
     /* controllo lunghezza */
-    if (strlen(cod) != C-1)
+    if (strlen(cod) != C-1) {
+        printf("%s codice troppo lungo\n", cod);
         return 0;
+    }
 
     /* controllo primi valori */
-    if (cod[0] != PRI && cod[1] != SEC)
+    if (cod[0] != PRI && cod[1] != SEC) {
+        printf("%s codice non inizia con i carattero %c%c\n", cod, PRI, SEC);
         return 0;
+    }
 
     /* controllo cifre successive alle prime due siano numeriche */
     int i;
-    for (i = 2; i < C; i++) {
-        if (!isalnum(cod[i]))
+    for (i = 2; i < C-1; i++) {
+        if (!isalnum(cod[i])) {
+            printf("%s codice non conteni caratteri numeri\n", cod);
             return 0;
+        }
     }
 
     /* controllo se codice è univoco per ogni personaggio */
     for (; x != NULL; x = x->next)
-        if (strcmp(cod, x->p.codice) == 0)
+        if (strcmp(cod, x->p.codice) == 0) {
+            printf("%s codice gia' esistete\n", cod);
             return 0;
+        }
 
     /* se abbiamo superato tutti i controlli il nostro codice è valido */
     return 1;
@@ -156,9 +164,11 @@ int controllo_codice(char *cod, link x)
 
 int leggi_personaggio(Pg_t *p, FILE *f)
 {
-    if (fscanf(f, "%s %s %s %d %d %d %d %d %d\n", p->codice, p->nome, p->classe, &p->stat.hp,
-           &p->stat.mp, &p->stat.atk, &p->stat.def, &p->stat.mag, &p->stat.spr) != EOF)
+    if (fscanf(f, "%s %s %s %d %d %d %d %d %d", p->codice, p->nome, p->classe, &p->stat.hp,
+           &p->stat.mp, &p->stat.atk, &p->stat.def, &p->stat.mag, &p->stat.spr) != EOF) {
+        p->equip.inUso = 0; // azzera valore oggetti in uso
         return 1;
+    }
 
     return 0;
 }
@@ -173,8 +183,8 @@ void funzione_carica_p(tabPg_t *tabPg) {
     /* ciclo acquisizione lista senza sapere il numero di elementi noti */
     int cnt = 0;
     Pg_t p;
-    struct nodePg_t x;
-    link *x = &tabPg->headPg;
+    link *x;
+    x = &(tabPg->headPg);
     link tail;
 
     while(leggi_personaggio(&p, fin)) {
@@ -183,6 +193,7 @@ void funzione_carica_p(tabPg_t *tabPg) {
             tail = malloc(sizeof(struct nodePg_t)); // crea nuovo nodo
             *x = tail; // elemento precedente punta a nuovo nodo
             tail->p = p; // il nuovo nodo assume i valori appena letti
+            tail->p.equip.inUso = 0; // azzera elementi in uso
             x = &(tail->next); // x punta all'elmento next del nuovo nodo che verrà modificato successivamente
             cnt++;
         }
@@ -224,7 +235,7 @@ void funzione_carica_o(tabInv_t *tabInv)
     int i;
     for (i = 0; i < tabInv->nInv; i++)
         /* acquisizione nuovo oggetto */
-        tabInv->vettInv[i] = nuovo_oggetto(f);
+        tabInv->vettInv[i] = nuovo_oggetto(fin);
 
 }
 
@@ -236,6 +247,8 @@ void funzione_carica_o(tabInv_t *tabInv)
 void funzione_aggiungi_p(tabPg_t *tabPg)
 {
     Pg_t p;
+
+    printf("[codice - nome - classe - hp - mp - atk - def - mag - spre]: ");
     leggi_personaggio(&p, stdin);
 
     if (controllo_codice(p.codice, tabPg->headPg)) {
@@ -260,10 +273,10 @@ void funzione_elimina_p(tabPg_t *tabPg)
     scanf("%s", str);
 
     /* questo for continua fin quando x non punatto al campo next dell'elemto puntato da tail */
-    for (*x = &tabPg->headPg; x != &tabPg->tailPg; x = &(*x->next)) {
-        if(strcmp(*x->p.codice, str) == 0) {
+    for (x = &tabPg->headPg; x != &tabPg->tailPg; x = &(*x)->next) {
+        if(strcmp((*x)->p.codice, str) == 0) {
             app = *x;
-            *x = *x->next; // punatatore a elemento next punta a elemento next di elemento puntato
+            *x = (*x)->next; // punatatore a elemento next punta a elemento next di elemento puntato
             free(app);
 
             tabPg->nPg--;
@@ -285,11 +298,12 @@ link ricerca(tabPg_t *tabPg)
     printf("Inserire codice: ");
     scanf("%s", str);
 
-    for (x = tabPg->headPg; flag && x != tabPg->headPg; x = x->next)
+    for (x = tabPg->headPg; x != NULL; x = x->next)
         if(strcmp(x->p.codice, str) == 0)
             return x;
 
     errore_comando("personaggio non trovato");
+    return NULL;
 }
 
 void stampa_oggetti(Inv_t *o, int n)
@@ -304,13 +318,15 @@ void funzione_aggiungi_o(tabPg_t *tabPg, tabInv_t *tabInv)
 {
     if (tabInv->nInv == 0) {
         errore_comando("non ci sono oggetti in lista");
-        return
+        return;
     }
 
     link x = ricerca(tabPg);
+    if (x == NULL) return; // se personaggio non trovato
+
     if (x->p.equip.inUso == 8) {
         errore_comando("il personaggio ha il numero massimo di oggetti disponibili");
-        return
+        return;
     }
 
     stampa_oggetti(tabInv->vettInv, tabInv->nInv);
@@ -329,15 +345,25 @@ void funzione_aggiungi_o(tabPg_t *tabPg, tabInv_t *tabInv)
     x->p.equip.inUso++;
 }
 
+void stampa_oggetti_puntati(Inv_t **o, int n)
+{
+    int i;
+    for (i = 0; i < n; i++)
+        printf("%d) %s %s %d %d %d %d %d %d\n", i+1, o[i]->nome, o[i]->tipo, o[i]->stat.hp, o[i]->stat.mp,
+               o[i]->stat.atk, o[i]->stat.def, o[i]->stat.mag, o[i]->stat.spr);
+}
+
 void funzione_elimina_o(tabPg_t *tabPg, tabInv_t *tabInv)
 {
-    link x = ricerca(tabPg);
-    if (x->p.equip.inUso == 0) {
-        errore_comando("il personaggio non possiede oggetti");
-        return
-    }
+            link x = ricerca(tabPg);
+            if (x == NULL) return; // se personaggio non trovato
 
-    stampa_oggetti(x->p.equip.vettEq, x->p.equip.inUso);
+            if (x->p.equip.inUso == 0) {
+                errore_comando("il personaggio non possiede oggetti");
+                return;
+            }
+
+    stampa_oggetti_puntati(x->p.equip.vettEq, x->p.equip.inUso);
 
     int n;
     printf("Inserire numero oggetto: ");
@@ -350,11 +376,102 @@ void funzione_elimina_o(tabPg_t *tabPg, tabInv_t *tabInv)
     /* eliminazione oggetto personaggio */
     n--;
     int i;
-    for (i = n; i < x->p.equip.inUso-1, i++)
+    for (i = n; i < x->p.equip.inUso-1; i++)
         x->p.equip.vettEq[n] = x->p.equip.vettEq[n+1];
     x->p.equip.inUso--;
 }
 
+
+/**
+ * CALCOLA STATISTICHE
+ */
+
+/* stampa le caratterstiche di un personaggio */
+void stampa_statistiche(Pg_t p, stat_t s)
+{
+    printf("%s di codice %s possiede di classe %s: ", p.nome, p.codice, p.classe);
+    printf(" hp-> %d\t atk-> %d\t spr-> %d\t", s.hp, s.atk, s.spr);
+    printf(" mp-> %d\t def-> %d\t mag-> %d\n", s.mp, s.def, s.mag);
+}
+
+/* somma totale statistiche */
+void somma(stat_t *s, stat_t v)
+{
+    s->def += v.def;
+    s->mp += v.mp;
+    s->atk += v.atk;
+    s->spr += v.spr;
+    s->hp += v.hp;
+    s->mag += v.mag;
+}
+
+/* se una statistica è minore di 0 assegna valore 1 */
+int v(int x)
+{
+    if (x < 0)
+        return 1;
+    else
+        return x;
+}
+
+/* controlla eventuali valori minori di zero */
+void check(stat_t *s)
+{
+    s->def = v(s->def);
+    s->mp = v(s->mp);
+    s->atk = v(s->atk);
+    s->spr = v(s->spr);
+    s->hp = v(s->hp);
+    s->mag = v(s->mag);
+}
+
+void funzione_calcola_statistichr(tabPg_t *tabPg)
+{
+    link x = ricerca(tabPg);
+    if (x == NULL) return; // se personaggio non trovato
+
+    if (x->p.equip.inUso == 0) {
+        errore_comando("il personaggio non possiede oggetti");
+    }
+
+    int i;
+    stat_t s;
+    s.hp = s.spr = s.mag = s.atk = s.def = s.def = 0;
+    for (i = 0; i < x->p.equip.inUso; i++)
+        somma(&s, x->p.equip.vettEq[i]->stat);
+
+    somma(&s, x->p.stat);
+    check(&s);
+
+    stampa_statistiche(x->p, s);
+}
+
+
+/**
+ * FUNZIONE FINE
+ */
+
+void funzione_fine(tabPg_t *tabPg, tabInv_t *tabInv)
+{
+    /* Disalloca personaggi */
+    link app, x = tabPg->headPg;
+    while(x != NULL)
+    {
+        app = x->next;
+        free(x);
+        x = app;
+    }
+    free(tabPg);
+
+    /* Disalloca inventario */
+    free(tabInv->vettInv);
+    free(tabInv);
+}
+
+
+/**
+ * MENU'
+ */
 
 void selezionaComando(comando_t e, tabPg_t *tabPg, tabInv_t *tabInv, int *f)
 {
@@ -363,23 +480,25 @@ void selezionaComando(comando_t e, tabPg_t *tabPg, tabInv_t *tabInv, int *f)
             funzione_carica_p(tabPg);
             break;
         case caricare_o:
-            funzione_carica_o(tabInv)
+            funzione_carica_o(tabInv);
             break;
         case aggiungere_p:
             funzione_aggiungi_p(tabPg);
             break;
         case eliminare_p:
-            funzione_eliminare_p(tabPg);
+            funzione_elimina_p(tabPg);
             break;
         case aggiungere_o:
             funzione_aggiungi_o(tabPg, tabInv);
             break;
         case eliminare_o:
-            funzione_eliminare_o(tabPg, tabInv);
+            funzione_elimina_o(tabPg, tabInv);
             break;
         case calcolo:
+            funzione_calcola_statistichr(tabPg);
             break;
         case fine:
+            funzione_fine(tabPg, tabInv);
             printf("Fine esecuzione!\n");
             *f = 0;
             break;
@@ -390,6 +509,7 @@ void selezionaComando(comando_t e, tabPg_t *tabPg, tabInv_t *tabInv, int *f)
     }
 }
 
+/* azzera valori dei wrapper degli elementi */
 void azzera(tabPg_t *tabPg, tabInv_t *tabInv)
 {
     tabPg->nPg = 0;
@@ -401,8 +521,8 @@ void azzera(tabPg_t *tabPg, tabInv_t *tabInv)
 
 int main(void) {
 
-    tabPg_t *tabPg;
-    tabInv_t *tabInv;
+    tabPg_t *tabPg = malloc(sizeof *tabPg);
+    tabInv_t *tabInv = malloc(sizeof *tabInv);
     /* azzera valori dei wrapper degli elementi */
     azzera(tabPg, tabInv);
 
@@ -413,7 +533,6 @@ int main(void) {
         e = leggiComando();
         selezionaComando(e, tabPg, tabInv, &flag);
     }
-
 
     return 0;
 }
