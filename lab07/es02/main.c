@@ -129,7 +129,7 @@ int promising(int *collana, int pos, int val, int *finale, int *cnt, int *cnt_va
  * funzione di ricorsiva che aggiorna, se trova valori migliori, la lunghezza massima
  * della combinazione creata e la combinazione stessa
  */
-void powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int max_val,
+int powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int max_val,
         int *cnt_val, int rpt, int max_rpt, int *f, int n_z, int n_s)
 {
     int i;
@@ -142,7 +142,7 @@ void powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int 
      * la lunghezza massim a di pietre possibili da sistemare
      */
     if (*cnt == max)
-        return;
+        return 1;
 
     /*
      * - ricorsione per ottenere disposizini ripetute
@@ -174,7 +174,8 @@ void powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int 
                 occ[i].n--;
 
                 /* chiamata ricorsiva */
-                powerset(occ, pos + 1, val + occ[i].v, collana, max, cnt, max_val, cnt_val, rpt, max_rpt, f, n_z, n_s);
+                if(powerset(occ, pos + 1, val + occ[i].v, collana, max, cnt, max_val, cnt_val, rpt, max_rpt, f, n_z, n_s))
+                    return 1;
 
                 /*
                  * incrementiamo nuovamente il valore di una data pietra per poterla
@@ -186,6 +187,7 @@ void powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int 
                 if (i == zaffiri) n_z--;
             }
     }
+    return 0;
 }
 
 void wrapper_powerset(Item *v, int max, int max_val, FILE *f, int rpt)
