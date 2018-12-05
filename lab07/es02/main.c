@@ -133,6 +133,7 @@ int powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int m
         int *cnt_val, int rpt, int max_rpt, int *f, int n_z, int n_s)
 {
     int i;
+    int tmp = rpt;
 
     /*
      * condizione di terminazione che non ci fa iniziare nessuna delle nostre
@@ -167,14 +168,14 @@ int powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int m
 
                 /* controllo valori ripetuti */
                 if(pos > 0 && collana[pos-1] == collana[pos])
-                    rpt++;
-                else rpt = 1;
+                    tmp  = rpt+1;
+                else tmp = 1;
 
                 /* decrementiamo il numero di valori di una data pietra dal vettore delle occorrenze */
                 occ[i].n--;
 
                 /* chiamata ricorsiva */
-                if(powerset(occ, pos + 1, val + occ[i].v, collana, max, cnt, max_val, cnt_val, rpt, max_rpt, f, n_z, n_s))
+                if(powerset(occ, pos + 1, val + occ[i].v, collana, max, cnt, max_val, cnt_val, tmp, max_rpt, f, n_z, n_s))
                     return 1;
 
                 /*
