@@ -99,10 +99,67 @@ att *leggi_attivita(int *n, char *nome)
     return v;
 }
 
+void swap(att *v, int i, int j)
+{
+    att tmp;
+    tmp = v[i];
+    v[i] = v[j];
+    v[j] = tmp;
+    return;
+}
+
+int partition(att *v, int r, int l)
+{
+    int q = r;
+    int i , j;
+    i = l;
+    j = r-1;
+
+    for( ; ; ) {
+        while (v[i].s < v[q].s || (v[i].s == v[q].s && v[i].f < v[q].f)) {
+            i++;
+            if (i == r) break;
+        }
+
+        while (v[j].s > v[q].s || (v[j].s == v[q].s && v[j].f > v[q].f)) {
+            j--;
+            if (j == l) break;
+        }
+
+        if (i >= j) break;
+        swap(v, i, j);
+    }
+    q = i;
+    swap(v, q, r);
+
+    return q;
+}
+
+void quicksort(att *v, int r, int l)
+{
+    if (r <= l)
+        return;
+
+    int q = partition(v, r, l);
+    quicksort(v, r, q+1);
+    quicksort(v, q-1, l);
+    return;
+}
+
+
+void stampa_lavori(att *v, int N)
+{
+    int i;
+    for (i = 0; i < N; i++)
+        printf("%d %d\n", v[i].s, v[i].f);
+}
+
 int main(int argc, char *argv[]) {
 
     int n;
     att *v = leggi_attivita(&n, argv[1]);
+    quicksort(v, n-1, 0);
+    stampa_lavori(v, n);
     attSel(n, v);
 
     return 0;
