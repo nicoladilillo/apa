@@ -1,0 +1,80 @@
+#TEST 1
+zaffiri =  8 [6], rubini =  1 [6], topazi =  10 [20], smeraldi =  5 [8], TOT = 24 {max_rip = 3}
+Soluzione ottima di valore 116 usando 13 gemma
+Combinazione collana: sstzzzrssstzz
+#TEST 2
+zaffiri =  6 [2], rubini =  5 [15], topazi =  7 [2], smeraldi =  2 [21], TOT = 20 {max_rip = 5}
+Soluzione ottima di valore 133 usando 15 gemma
+Combinazione collana: tzzrtrtrtrtrsst
+#TEST 3
+zaffiri =  10 [17], rubini =  7 [16], topazi =  8 [18], smeraldi =  10 [17], TOT = 35 {max_rip = 3}
+Soluzione ottima di valore 596 usando 35 gemma
+Combinazione collana: tzzzrtzzzrtzzzrtrstrssstrssstrssstz
+#TEST 4
+zaffiri =  7 [10], rubini =  1 [13], topazi =  9 [16], smeraldi =  2 [20], TOT = 19 {max_rip = 5}
+Soluzione ottima di valore 105 usando 7 gemma
+Combinazione collana: tzzrsst
+#TEST 5
+zaffiri =  6 [8], rubini =  6 [25], topazi =  8 [20], smeraldi =  10 [10], TOT = 30 {max_rip = 7}
+Soluzione ottima di valore 438 usando 29 gemma
+Combinazione collana: tzzzzzrtrtrtrtrssstrssssssstz
+#TEST 6
+zaffiri =  5 [21], rubini =  6 [7], topazi =  1 [13], smeraldi =  5 [1], TOT = 17 {max_rip = 9}
+Soluzione ottima di valore 137 usando 13 gemma
+Combinazione collana: zzzzrssssstzr
+#TEST 7
+zaffiri =  9 [7], rubini =  5 [3], topazi =  3 [10], smeraldi =  8 [8], TOT = 25 {max_rip = 6}
+Soluzione ottima di valore 162 usando 23 gemma
+Combinazione collana: zzzzzzrtzzrtrsstrssssss
+#TEST 8
+zaffiri =  7 [5], rubini =  8 [5], topazi =  6 [12], smeraldi =  8 [15], TOT = 29 {max_rip = 5}
+Soluzione ottima di valore 262 usando 28 gemma
+Combinazione collana: zzzzzrtzrtrtrtrsstrssssstzrs
+#TEST 9
+zaffiri =  4 [1], rubini =  8 [19], topazi =  8 [13], smeraldi =  6 [19], TOT = 26 {max_rip = 1}
+Soluzione ottima di valore 374 usando 26 gemma
+Combinazione collana: zrtzrtzrstrstrstrstzrstrst
+#TEST 10
+zaffiri =  9 [17], rubini =  3 [11], topazi =  9 [3], smeraldi =  9 [5], TOT = 30 {max_rip = 7}
+Soluzione ottima di valore 243 usando 25 gemma
+Combinazione collana: tzzzzzzzrtzrsstrssssssstz
+#TEST 11
+zaffiri =  1 [15], rubini =  1 [12], topazi =  5 [14], smeraldi =  10 [15], TOT = 17 {max_rip = 6}
+Soluzione ottima di valore 205 usando 14 gemma
+Combinazione collana: sssstzrsssssst
+#TEST 12
+zaffiri =  2 [19], rubini =  9 [14], topazi =  3 [6], smeraldi =  5 [19], TOT = 19 {max_rip = 3}
+Soluzione ottima di valore 207 usando 14 gemma
+Combinazione collana: zrtrtrsstzrsss
+#TEST 13
+zaffiri =  4 [21], rubini =  5 [10], topazi =  2 [16], smeraldi =  7 [5], TOT = 18 {max_rip = 10}
+Soluzione ottima di valore 181 usando 16 gemma
+Combinazione collana: zzzrtrsssstzrsss
+#TEST 14
+zaffiri =  5 [20], rubini =  6 [14], topazi =  9 [3], smeraldi =  6 [17], TOT = 26 {max_rip = 4}
+Soluzione ottima di valore 307 usando 24 gemma
+Combinazione collana: tzzzzrtrtrtrtrsstrsssstz
+#TEST 15
+zaffiri =  9 [17], rubini =  8 [5], topazi =  9 [21], smeraldi =  2 [11], TOT = 28 {max_rip = 9}
+Soluzione ottima di valore 285 usando 21 gemma
+Combinazione collana: tzzrtrtrtrtrtrtrtrsst
+#TEST 16
+zaffiri =  7 [25], rubini =  1 [19], topazi =  3 [3], smeraldi =  6 [20], TOT = 17 {max_rip = 8}
+Soluzione ottima di valore 295 usando 15 gemma
+Combinazione collana: tzzzzzzrsssssst
+#TEST 17
+zaffiri =  6 [19], rubini =  2 [22], topazi =  5 [3], smeraldi =  4 [11], TOT = 17 {max_rip = 8}
+Soluzione ottima di valore 173 usando 13 gemma
+Combinazione collana: tzzzzrtrsssst
+#TEST 18
+zaffiri =  9 [3], rubini =  3 [1], topazi =  5 [2], smeraldi =  3 [24], TOT = 20 {max_rip = 9}
+Soluzione ottima di valore 92 usando 13 gemma
+Combinazione collana: tzzzrtrtrssst
+#TEST 19
+zaffiri =  5 [19], rubini =  10 [1], topazi =  7 [6], smeraldi =  9 [5], TOT = 31 {max_rip = 1}
+Soluzione ottima di valore 185 usando 28 gemma
+Combinazione collana: zrstzrstzrstzrstrstzrstrstrs
+#TEST 20
+zaffiri =  4 [13], rubini =  8 [1], topazi =  2 [8], smeraldi =  10 [23], TOT = 24 {max_rip = 3}
+Soluzione ottima di valore 278 usando 18 gemma
+Combinazione collana: zzzrssstrssstzrsss

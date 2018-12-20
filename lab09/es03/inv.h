@@ -12,7 +12,7 @@ typedef struct {
 
 void stampa_oggetti(Inv_t *o, int n);
 Inv_t nuovo_oggetto(FILE *f);
-void stampa(Inv_t o);
+void stampa_oggetto(Inv_t o);
 
 
 #endif //ES03_OGGETTI_H

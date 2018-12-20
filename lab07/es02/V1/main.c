@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define OUTPUT "log.txt"
 
@@ -71,7 +72,7 @@ void swap(int *cnt, int *cnt_val, int *f, int pos, int val, int *c)
  * un topazio deve essere seguito immediatamente o da uno zaffiro o da un rubino.
  */
 int promising(int *collana, int pos, int val, int *finale, int *cnt, int *cnt_val,
-        int rpt, int max_rpt, int n_z, int n_s)
+        int rpt, int max_rpt, int n_z, int n_s, Item *occ)
 {
     /*
      * dobbiamo dire se il valore precedente a quello puntato
@@ -108,9 +109,14 @@ int promising(int *collana, int pos, int val, int *finale, int *cnt, int *cnt_va
     }
 
     /*
-     * il numero degli zaffiri non può essere maggiore del numero degli smeraldi
+     * il numero degli zaffiri non può essere maggiore del numero degli smeraldi e:
+     * - se il numero degli zaffiri è maggiore di quello degli smeraldi e non abbiamo
+     *   più smeraldi allora non possiamo andare avanti con la creazione della nostra collana;
+     * - se il numero degli zaffiri è zero e la differenza tra gli zaffiri nella collana e gli
+     *   smeraldi + maggiore del numero di smeraldi disponibili
      */
-    if (n_z > n_s) return 0;
+    if (n_z > n_s && (occ[smeraldi].n == 0 || (occ[zaffiri].n == 0 && n_z-n_s <= occ[smeraldi].n )))
+        return 0;
 
     /* non dobbiamo superare le ripetizioni massime */
     if (rpt > max_rpt) return 0;
@@ -118,8 +124,10 @@ int promising(int *collana, int pos, int val, int *finale, int *cnt, int *cnt_va
     /*
     * se siamo arrivati qua dobbiamo controllare che il nostro nuovo valore sia
     * maggiore di quello vecchio e nel caso sostituira i valori della combinazione finale
+    * ma dobbiamo ricordare che il numero degli zaffiri non può essere maggiore
+    * del numero degli smeraldi
     */
-    if (val > *cnt_val)
+    if (val > *cnt_val && n_z <= n_s)
         swap(cnt, cnt_val, finale, pos, val, collana);
 
     return 1;
@@ -133,7 +141,7 @@ int powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int m
         int *cnt_val, int rpt, int max_rpt, int *f, int n_z, int n_s)
 {
     int i;
-    int tmp = rpt;
+    int tmp; // per memorizzare numero ripetizioni fino a questo momento con una data pietra
 
     /*
      * condizione di terminazione che non ci fa iniziare nessuna delle nostre
@@ -151,7 +159,7 @@ int powerset(Item *occ, int pos, int val, int *collana, int max, int *cnt, int m
      *   controllando la mossa precedente, pos-1 perchè nella posizione pos non
      *   abiamo inserito ancora nessun valore
      */
-    if (pos <= 1  || promising(collana, pos-1, val, f, cnt, cnt_val, rpt, max_rpt, n_z, n_s)) {
+    if (pos <= 1  || promising(collana, pos-1, val, f, cnt, cnt_val, rpt, max_rpt, n_z, n_s, occ)) {
         /*
          * per avere una ripetizione su tutti i possibili valori da inserire
          */
@@ -261,7 +269,9 @@ void leggi_valori(FILE *in, FILE *out)
     wrapper_powerset(p, max, val_max, out, rpt);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
+    clock_t start = clock();
 
     FILE *fin, *fout;
     apri_file(&fin, argv[1], "r");
@@ -280,5 +290,9 @@ int main(int argc, char **argv) {
     fclose(fin);
     fclose(fout);
 
+    /* calcolo tempo elaborazione */
+    clock_t stop = clock();
+    double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
+    printf("\nTime elapsed: %.5f\n", elapsed);
     return 0;
 }

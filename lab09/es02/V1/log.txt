@@ -1,0 +1,90 @@
+#TEST 1
+zaffiri =  27, rubini =  46, topazi =  25, smeraldi =  26, TOT = 4
+Collana massima di lunghezza 104
+#TEST 2
+zaffiri =  19, rubini =  23, topazi =  24, smeraldi =  21, TOT = 4
+Collana massima di lunghezza 87
+#TEST 3
+zaffiri =  14, rubini =  34, topazi =  48, smeraldi =  23, TOT = 4
+Collana massima di lunghezza 106
+#TEST 4
+zaffiri =  10, rubini =  24, topazi =  20, smeraldi =  33, TOT = 4
+Collana massima di lunghezza 84
+#TEST 5
+zaffiri =  32, rubini =  39, topazi =  48, smeraldi =  35, TOT = 4
+Collana massima di lunghezza 146
+#TEST 6
+zaffiri =  25, rubini =  29, topazi =  10, smeraldi =  11, TOT = 4
+Collana massima di lunghezza 57
+#TEST 7
+zaffiri =  45, rubini =  43, topazi =  21, smeraldi =  36, TOT = 4
+Collana massima di lunghezza 124
+#TEST 8
+zaffiri =  48, rubini =  19, topazi =  42, smeraldi =  29, TOT = 4
+Collana massima di lunghezza 116
+#TEST 9
+zaffiri =  21, rubini =  12, topazi =  22, smeraldi =  19, TOT = 4
+Collana massima di lunghezza 65
+#TEST 10
+zaffiri =  37, rubini =  39, topazi =  40, smeraldi =  12, TOT = 4
+Collana massima di lunghezza 128
+#TEST 11
+zaffiri =  21, rubini =  47, topazi =  16, smeraldi =  34, TOT = 4
+Collana massima di lunghezza 88
+#TEST 12
+zaffiri =  17, rubini =  16, topazi =  15, smeraldi =  44, TOT = 4
+Collana massima di lunghezza 92
+#TEST 13
+zaffiri =  50, rubini =  36, topazi =  15, smeraldi =  24, TOT = 4
+Collana massima di lunghezza 105
+#TEST 14
+zaffiri =  24, rubini =  10, topazi =  10, smeraldi =  47, TOT = 4
+Collana massima di lunghezza 91
+#TEST 15
+zaffiri =  35, rubini =  34, topazi =  11, smeraldi =  21, TOT = 4
+Collana massima di lunghezza 79
+#TEST 16
+zaffiri =  39, rubini =  48, topazi =  35, smeraldi =  46, TOT = 4
+Collana massima di lunghezza 156
+#TEST 17
+zaffiri =  24, rubini =  13, topazi =  35, smeraldi =  41, TOT = 4
+Collana massima di lunghezza 92
+#TEST 18
+zaffiri =  38, rubini =  15, topazi =  20, smeraldi =  29, TOT = 4
+Collana massima di lunghezza 98
+#TEST 19
+zaffiri =  15, rubini =  46, topazi =  38, smeraldi =  28, TOT = 4
+Collana massima di lunghezza 120
+#TEST 20
+zaffiri =  40, rubini =  29, topazi =  35, smeraldi =  26, TOT = 4
+Collana massima di lunghezza 125
+#TEST 21
+zaffiri =  24, rubini =  18, topazi =  22, smeraldi =  44, TOT = 4
+Collana massima di lunghezza 105
+#TEST 22
+zaffiri =  45, rubini =  16, topazi =  44, smeraldi =  50, TOT = 4
+Collana massima di lunghezza 128
+#TEST 23
+zaffiri =  44, rubini =  30, topazi =  49, smeraldi =  26, TOT = 4
+Collana massima di lunghezza 131
+#TEST 24
+zaffiri =  48, rubini =  12, topazi =  14, smeraldi =  45, TOT = 4
+Collana massima di lunghezza 118
+#TEST 25
+zaffiri =  34, rubini =  32, topazi =  38, smeraldi =  21, TOT = 4
+Collana massima di lunghezza 120
+#TEST 26
+zaffiri =  40, rubini =  48, topazi =  25, smeraldi =  32, TOT = 4
+Collana massima di lunghezza 123
+#TEST 27
+zaffiri =  14, rubini =  47, topazi =  17, smeraldi =  39, TOT = 4
+Collana massima di lunghezza 88
+#TEST 28
+zaffiri =  10, rubini =  40, topazi =  35, smeraldi =  25, TOT = 4
+Collana massima di lunghezza 106
+#TEST 29
+zaffiri =  23, rubini =  29, topazi =  38, smeraldi =  14, TOT = 4
+Collana massima di lunghezza 96
+#TEST 30
+zaffiri =  48, rubini =  49, topazi =  13, smeraldi =  50, TOT = 4
+Collana massima di lunghezza 125

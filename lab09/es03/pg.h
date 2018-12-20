@@ -24,7 +24,6 @@ typedef struct {
 int leggi_personaggio(Pg_t *p, FILE *f);
 void stampa_personaggio(Pg_t p, stat_t s);
 void somma(stat_t *s, stat_t v);
-int v(int x);
 void check(stat_t *s);
 
 #endif //ES03_PERSONAGGI_H

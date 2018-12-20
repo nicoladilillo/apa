@@ -21,7 +21,7 @@ att *leggi_attivita(int *n, char *nome)
     return v;
 }
 
-/* scambio di due elementi vettore dipo att */
+/* scambio di due elementi vettore tipo att */
 void swap(att *v, int i, int j)
 {
     att tmp;
@@ -71,34 +71,45 @@ void quicksort(att *v, int r, int l)
     return;
 }
 
-
-void stampa_lavori(att *v, int N)
-{
-    int i;
-    for (i = 0; i <= N; i++)
-        printf("%d %d\n", v[i].s, v[i].f);
-}
-
+/* ritorna la durata di un lavoro come differenza tra inizio e fine */
 int durata(att v)
 {
     return v.f-v.s;
 }
 
+/* funzione ricorsiva che mi stampa i valori massimi calcolati
+ * partendo dal valore puntato da tail (o dai valori)*/
 void stampa(att *v, int *indici, int i, int f)
 {
+    /*
+     * quando siamo arrivati all'inizio del nostro vettore, indice
+     * i == 0, iniziamo la risalita per la stampa di tutti valori
+     */
     if (i == 0)
         return;
 
+    /*
+     * chiamata ricorsiva che passa l'indice del lavoro precedente,
+     * presente nel vettore di indici alla posizione puntata
+     */
     stampa(v, indici, indici[i], f);
+
+    // stampa valori inizio e fine lavoro all'indice i
     printf("(%d %d)", v[i].s, v[i].f);
+
+    /*
+     * per capire se il lavoro ha o no un successore l'indice deve
+     * essere diverso da quello iniziale
+     */
     if (i != f)
         printf(", ");
 }
 
-/* stampa soluzione */
+/* funzione wrapper che stampa ogni soluzione */
 void stampa_sol_dinamica(att *v, int *indici, int *tail, int cnt, int max) {
     int i;
     for (i = 0; i <= cnt; i++) {
+        // se abbiamo più di una soluzione
         if (cnt > 0)
             printf("SOLUZIONE %d:\t", i + 1);
         stampa(v, indici, tail[i], tail[i]);
@@ -130,19 +141,30 @@ void soluzione_dinamica(att *v, int N)
 
     int i, j;
     for (i = 2; i <= N; i++) {
-        for (j = i-1; j > 0; j--)
-        if(check(v[i], v[j]) && (opt[i] < durata(v[i]) + opt[j])) {
-            opt[i] = durata(v[i]) + opt[j];
-            indici[i] = j;
+        for (j = i-1; j > 0; j--) {
+            /*
+             * se inizio e fine dei due lavori non si intersecano (funzione check)
+             * e se la somma della durata del primo lavoro più la somma della durata
+             * di tutti i lavori che precedono il seconodo lavoro (soluzioen ottima) è
+             * migliore di un valore già calcolato precedentemente con un'altre somme
+             * di durate di altri lavori
+             */
+            if (check(v[i], v[j]) && (opt[i] < durata(v[i]) + opt[j])) {
+                // durata totale migliore calcolara per quel lavoro
+                opt[i] = durata(v[i]) + opt[j];
+                // assegna indice lavoro precedente
+                indici[i] = j;
 
-            if (opt[i] > ris) {
-                // se si supera il massimo
-                ris = opt[i];
-                cnt = 0;
-                tail[cnt] = i;
-            } else if (opt[i] == ris) {
-                // se ha stesso valore di tail
-                tail[++cnt] = i;
+                if (opt[i] > ris) {
+                    // se si supera il massimo si avrà soluzione migliore
+                    ris = opt[i];
+                    cnt = 0;
+                    tail[cnt] = i;
+                } else if (opt[i] == ris) {
+                    // se ha stesso valore di tail si avrà un'altra soluzione
+                    // cone stessa durata
+                    tail[++cnt] = i;
+                }
             }
         }
     }

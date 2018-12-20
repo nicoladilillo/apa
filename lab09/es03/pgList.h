@@ -2,8 +2,6 @@
 #define ES03_PGLIST_H
 
 #include "invArray.h"
-#include "equipArray.h"
-#include "pg.h"
 
 typedef struct  tabPg_t*  TABPG;
 

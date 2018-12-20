@@ -3,7 +3,9 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "pg.h"
 #include "pgList.h"
+#include "equipArray.h"
 
 /* struttura wrapper per lista personaggi */
 struct  tabPg_t {
@@ -38,7 +40,7 @@ void distruttore_tabPg(TABPG p)
     }
 }
 
-int controllo_codice(char *cod, link x)
+static int controllo_codice(char *cod, link x)
 {
     /* controllo lunghezza */
     if (strlen(cod) != C-1) {
@@ -72,6 +74,7 @@ int controllo_codice(char *cod, link x)
     return 1;
 }
 
+/* carica personaggi */
 void funzione_carica_p(TABPG tabPg)
 {
     FILE *fin;
@@ -104,6 +107,7 @@ void funzione_carica_p(TABPG tabPg)
     tabPg->nPg = cnt; // numero elementi nella lista
 }
 
+/* aggiungi un personaggio da tastiera */
 void funzione_aggiungi_p(TABPG tabPg)
 {
     Pg_t p;
@@ -119,6 +123,7 @@ void funzione_aggiungi_p(TABPG tabPg)
     }
 }
 
+/* elimina un personaggio */
 void funzione_elimina_p(TABPG tabPg)
 {
     link *x, app;
@@ -142,7 +147,8 @@ void funzione_elimina_p(TABPG tabPg)
     errore_comando("personaggio non trovato");
 }
 
-link ricerca(TABPG tabPg)
+/* restituisce l'indirizzo del personaggio che stiamo cercando */
+static link ricerca(TABPG tabPg)
 {
     link x;
     char str[N];
@@ -158,6 +164,7 @@ link ricerca(TABPG tabPg)
     return NULL;
 }
 
+/* agiungi oggetto al personaggio */
 void funzione_aggiungi_o(TABPG tabPg, TABINV tabInv)
 {
     if (print_tabInv_nInv(tabInv) == 0) {
@@ -168,26 +175,15 @@ void funzione_aggiungi_o(TABPG tabPg, TABINV tabInv)
     link x = ricerca(tabPg);
     if (x == NULL) return; // se personaggio non trovato
 
-    if (print_equipArray_inUso(x->p.equip) == 8) {
+    if (print_equipArray_inUso(x->p.equip) == MAX) {
         errore_comando("il personaggio ha il numero massimo di oggetti disponibili");
         return;
     }
 
-    print_tabInv(tabInv);
-
-    int n;
-    printf("Inserire numero oggetto: ");
-    scanf("%d", &n);
-    if (n > print_tabInv_nInv(tabInv)) {
-        errore_comando("oggetto non presente");
-        return;
-    }
-
-    /* assegnazione oggetto personaggio */
-    n--;
-    assegnazione_oggetto(x->p.equip, n);
+    assegnazione_oggetto(x->p.equip, tabInv);
 }
 
+/* elimina oggetto da un personaggio */
 void funzione_elimina_o(TABPG tabPg, TABINV tabInv)
 {
     link x = ricerca(tabPg);
@@ -198,6 +194,7 @@ void funzione_elimina_o(TABPG tabPg, TABINV tabInv)
         return;
     }
 
+    /* stampa tutti gli oggetti rquipaggiati a quel personaggio */
     print_equipArray(x->p.equip, tabInv);
 
     int n;
@@ -213,6 +210,7 @@ void funzione_elimina_o(TABPG tabPg, TABINV tabInv)
     eliminazione_oggetto(x->p.equip, n);
 }
 
+/* stampa infomrazioni personaggio e oggetti che possiede */
 void funzione_ricerca_p_statistiche(TABPG tabPg, TABINV tabInv)
 {
     link x = ricerca(tabPg);
@@ -223,13 +221,14 @@ void funzione_ricerca_p_statistiche(TABPG tabPg, TABINV tabInv)
     stampa_personaggio(x->p, x->p.stat);
     printf("\n");
 
-    /* stampa oggetti posseduti dal personaggio */
+    /* stampa_oggetto oggetti posseduti dal personaggio */
     if (print_equipArray_inUso(x->p.equip) > 0)
         print_equipArray(x->p.equip, tabInv);
     else
         printf("Il personaggio non possiede oggetti\n");
 }
 
+/* ricerca un personaggio per codice */
 void funzione_ricerca_p(TABPG tabPg)
 {
     link x = ricerca(tabPg);
@@ -239,6 +238,7 @@ void funzione_ricerca_p(TABPG tabPg)
     printf("Codice presente! NOME: %s\n", x->p.nome);
 }
 
+/* calcola statistiche totali di un personaggio */
 void funzione_calcola_statistiche(TABPG tabPg, TABINV tabInv)
 {
     link x = ricerca(tabPg);
@@ -249,13 +249,22 @@ void funzione_calcola_statistiche(TABPG tabPg, TABINV tabInv)
         printf("il personaggio non possiede oggetti\n");
 
     int i;
-    stat_t s;
+    stat_t s, p;
     s.hp = s.spr = s.mag = s.atk = s.def = s.mp = 0;
-    for (i = 0; i < n; i++)
-        somma(&s, print_tabInv_vettInv_stat(tabInv, print_equip_indice(x->p.equip, i)));
+    for (i = 0; i < n; i++) {
+        /* assimila i valori statistica dell'oggetto */
+        p.hp = print_tabInv_hp(tabInv, print_equip_indice(x->p.equip, i));
+        p.spr = print_tabInv_spr(tabInv, print_equip_indice(x->p.equip, i));
+        p.mag = print_tabInv_mag(tabInv, print_equip_indice(x->p.equip, i));
+        p.atk = print_tabInv_atk(tabInv, print_equip_indice(x->p.equip, i));
+        p.def = print_tabInv_def(tabInv, print_equip_indice(x->p.equip, i));
+        p.mp = print_tabInv_mp(tabInv, print_equip_indice(x->p.equip, i));
+        somma(&s, p); // effettua la somma dei nuovi valori
+    }
 
     somma(&s, x->p.stat);
     check(&s);
 
+    /* stampa personaggop e relativi valori calcolari */
     stampa_personaggio(x->p, s);
 }

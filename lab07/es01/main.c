@@ -108,7 +108,7 @@ int promising(int *collana, int pos, int *finale, int *cnt)
  * funzione di ricorsiva che aggiorna, se trova valori migliori, la lunghezza massima
  * della combinazione creata e la combinazione stessa
  */
-void powerset(int *occ, int pos, int *collana, int max, int *cnt, int *f)
+int powerset(int *occ, int pos, int *collana, int max, int *cnt, int *f)
 {
     int i;
 
@@ -120,7 +120,7 @@ void powerset(int *occ, int pos, int *collana, int max, int *cnt, int *f)
      * la lunghezza massim a di pietre possibili da sistemare
      */
     if (*cnt == max)
-        return;
+        return 1;
 
     /*
      * - ricorsione per ottenere disposizini ripetute
@@ -148,7 +148,8 @@ void powerset(int *occ, int pos, int *collana, int max, int *cnt, int *f)
                 /*
                  * chiamata ricorsiva
                  */
-                powerset(occ, pos + 1, collana, max, cnt, f);
+                if(powerset(occ, pos + 1, collana, max, cnt, f))
+                    return 1;
                 /*
                  * incrementiamo nuovamente il valore di una data pietra per poterla
                  * utilzzare in una prossima chiamata in una diversa posizione
@@ -157,7 +158,7 @@ void powerset(int *occ, int pos, int *collana, int max, int *cnt, int *f)
             }
     }
 
-    return;
+    return 0;
 }
 
 void informazioni(int *t, int max, FILE *f) {

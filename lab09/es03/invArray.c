@@ -2,27 +2,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "inv.h"
 #include "invArray.h"
 
 /* struttura wrapper per oggetti inventario */
 struct tabInv_t {
     Inv_t *vettInv;
     int nInv;
-    int maxInv;
+    int maxInv; // massimo numero oggetti equipaggiabili
 };
 
+/* alloca */
 TABINV costruttore_tabInv()
 {
     TABINV p = malloc(sizeof *p);
     return p;
 }
 
+/* dealloca */
 TABINV distruttore_tabInv(TABINV p)
 {
     free(p->vettInv);
     free(p);
 }
 
+/* carica oggetti */
 void funzione_carica_o(TABINV tabInv)
 {
     FILE *fin ;
@@ -43,6 +47,7 @@ void funzione_carica_o(TABINV tabInv)
 
 }
 
+/* ricerca un oggetto per nome */
 void ricerca_oggetto(TABINV tabInv)
 {
     int i;
@@ -61,22 +66,54 @@ void ricerca_oggetto(TABINV tabInv)
         stampa_oggetti(&tabInv->vettInv[i], 1);
 }
 
+/* restituisce il valore del numero di oggetti nel vettore */
 int print_tabInv_nInv(TABINV tabInv)
 {
     return tabInv->nInv;
 }
 
+/* stampa tutti gli oggetti nel vettore */
 void print_tabInv(TABINV tabInv)
 {
     stampa_oggetti(tabInv->vettInv, tabInv->nInv);
 }
 
-Inv_t print_tabInv_vettInv(TABINV tabInv, int i)
+/* stampa un singolo oggetto */
+void print_tabInv_oggetto(TABINV tabinv, int i)
 {
-    return tabInv->vettInv[i];
+    stampa_oggetto(tabinv->vettInv[i]);
 }
 
-stat_t print_tabInv_vettInv_stat(TABINV tabInv, int i)
+/*
+ * queste funzioni restituiscono tutti
+ * i campi della variabile statisrica
+ */
+int print_tabInv_hp(TABINV tabinv, int i)
 {
-    return tabInv->vettInv[i].stat;
+    return tabinv->vettInv[i].stat.hp;
+}
+
+int print_tabInv_mp(TABINV tabinv, int i)
+{
+    return tabinv->vettInv[i].stat.mp;
+}
+
+int print_tabInv_atk(TABINV tabinv, int i)
+{
+    return tabinv->vettInv[i].stat.atk;
+}
+
+int print_tabInv_def(TABINV tabinv, int i)
+{
+    return tabinv->vettInv[i].stat.def;
+}
+
+int print_tabInv_mag(TABINV tabinv, int i)
+{
+    return tabinv->vettInv[i].stat.mag;
+}
+
+int print_tabInv_spr(TABINV tabinv, int i)
+{
+    return tabinv->vettInv[i].stat.spr;
 }

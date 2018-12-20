@@ -15,16 +15,18 @@ Inv_t nuovo_oggetto(FILE *f)
     return t;
 }
 
+/* stampa un insieme di oggetti */
 void stampa_oggetti(Inv_t *o, int n)
 {
     int i;
     for (i = 0; i < n; i++) {
         printf("%d) ", i + 1);
-        stampa(o[i]);
+        stampa_oggetto(o[i]);
     }
 }
 
-void stampa(Inv_t o)
+/* stampa tutte informazioni sigoli oggetti */
+void stampa_oggetto(Inv_t o)
 {
     printf("%s %s %d %d %d %d %d %d\n", o.nome, o.tipo, o.stat.hp, o.stat.mp,
            o.stat.atk, o.stat.def, o.stat.mag, o.stat.spr);

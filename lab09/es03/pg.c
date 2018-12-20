@@ -5,7 +5,7 @@
 
 #include "pg.h"
 
-
+/* acquisisci tutti i personaggi */
 int leggi_personaggio(Pg_t *p, FILE *f)
 {
     if (fscanf(f, "%s %s %s %d %d %d %d %d %d", p->codice, p->nome, p->classe, &p->stat.hp, &p->stat.mp,
@@ -17,7 +17,7 @@ int leggi_personaggio(Pg_t *p, FILE *f)
     return 0;
 }
 
-/* stampa le caratterstiche di un personaggio */
+/* stampa_oggetto e le caratterstiche di un personaggio */
 void stampa_personaggio(Pg_t p, stat_t s)
 {
     printf("%s di codice %s possiede di classe %s: ", p.nome, p.codice, p.classe);
@@ -37,7 +37,7 @@ void somma(stat_t *s, stat_t v)
 }
 
 /* se una statistica è minore di 0 assegna valore 1 */
-int v(int x)
+static int v(int x)
 {
     if (x <= 0)
         return 1;

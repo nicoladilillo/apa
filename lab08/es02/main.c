@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define E -1
+#define E -1 // valori per satbilire valori di board di base non fissati
 
 typedef struct {
     char colore;
@@ -56,6 +56,7 @@ void leggi_Tessere(cella_t *p, char *str)
     }
 }
 
+/* leggiamo la scacchiera e le tessere già inserite */
 int leggi_Board(board_t *p, cella *c, char *str)
 {
     FILE *fin;
@@ -69,6 +70,7 @@ int leggi_Board(board_t *p, cella *c, char *str)
         p->b[i] = malloc(p->c * sizeof(board));
         for (j = 0; j < p->c; j++) {
             fscanf(fin, "%d/%d", &t, &r);
+            // se abbiamo dei valori fissati
             if (t != E || r != E) {
                 p->b[i][j].c = &c[t];
                 p->b[i][j].ruotato = r;
@@ -83,6 +85,11 @@ int leggi_Board(board_t *p, cella *c, char *str)
     return cnt;
 }
 
+/*
+ * ruotiamo valore (colore e valore) in base a se ci serve
+ * la riga o la colonna e in base a se la nostra tessera è
+ * ruotata o meno
+ */
 Val_t ruota(cella *c, int r, int n)
 {
     if (n == 1) {
@@ -100,6 +107,7 @@ Val_t ruota(cella *c, int r, int n)
     }
 }
 
+/* controllo le somme per righe e per colonne */
 void check(board_t b, board **f, int *s)
 {
     int i, j, c;
@@ -108,7 +116,7 @@ void check(board_t b, board **f, int *s)
     int flag;
     int tot = 0;
 
-    // controllo per righe
+    // controllo per righe quando c == 1
     c = 1;
     for (i = 0; i < b.r; i++) {
         v[0] = ruota(b.b[i][0].c, b.b[i][0].ruotato, c);
@@ -119,7 +127,6 @@ void check(board_t b, board **f, int *s)
             v[1] = ruota(b.b[i][j].c, b.b[i][j].ruotato, c);
             if (v[1].colore == v[0].colore) {
                 somma += v[1].valore;
-                v[0] = v[1];
             } else {
                 somma = 0;
                 flag = 0;
@@ -128,7 +135,7 @@ void check(board_t b, board **f, int *s)
         tot += somma;
     }
 
-    // controllo per colonne
+    // controllo per colonne quando c == 2
     c = 2;
     for (i = 0; i < b.c; i++) {
         v[0] = ruota(b.b[0][i].c, b.b[0][i].ruotato, c);
@@ -148,63 +155,65 @@ void check(board_t b, board **f, int *s)
     }
 
     // se la somma totale è maggiore della precedente allora scambia valori
-    if (tot > *s)
-    {
+    if (tot > *s) {
         *s = tot;
         for (i = 0; i < b.r; i++)
-            for (j = 0; j < b.c; j++) {
-                f[i][j].c = b.b[i][j].c;
-                f[i][j].ruotato = b.b[i][j].ruotato;
-            }
+            for (j = 0; j < b.c; j++)
+                f[i][j] = b.b[i][j];
     }
+
 }
 
-void powerset(cella_t c, board_t b, int cnt, board **f, int *s)
+/* disposizioni semplici per analizzare tutte le possibili combinazioni di celle */
+void powerset(cella_t c, board_t b, int cnt, board **f, int *s, int riga, int colonna, int pos)
 {
-    // se abbiamo analizzato tutte le celle controlliamo il valore ottenuto
+    // se abbiamo analizzato tutte le celle controlliamo le somme ottenute
     if (cnt >= c.n) {
         check(b, f, s);
         return;
     }
 
     int i, j, k;
-    for (i = 0; i < c.n; i++) {
+    for (i = pos; i < c.n; i++) {
         // controllo se cella non è stata presa
         if (!c.c[i].usato) {
             c.c[i].usato = 1;
-            for (j = 0; j < b.r; j++) {
-                for (k = 0; k < b.c; k++) {
+            for (j = riga; j < b.r; j++) {
+                for (k = colonna; k < b.c; k++) {
                     // controllo se cella nella board non è già stata occupata
                     if (!b.b[j][k].fissato) {
-                        b.b[j][k].fissato = 1;
+                        b.b[j][k].fissato = 1; // fissiamolo
 
                         b.b[j][k].c = &c.c[i];
                         b.b[j][k].ruotato = 0; // prima non ruotato
-                        powerset(c, b, cnt + 1, f, s);
+                        powerset(c, b, cnt + 1, f, s, riga, colonna, pos);
                         b.b[j][k].ruotato = 1;
-                        powerset(c, b, cnt + 1, f, s); // dopo ruotato
+                        powerset(c, b, cnt + 1, f, s, riga, colonna, pos); // dopo ruotato
 
-                        b.b[j][k].fissato = 0;
+                        b.b[j][k].fissato = 0; // rimuoviamolo
                     }
                 }
             }
-            c.c[i].usato = 0;
+            c.c[i].usato = 0; // cella non più usata
 
         }
     }
 }
 
+// stampa valore di ogni cella
 void stampa_val(Val_t v1, Val_t v2)
 {
     printf("%c-%c%d-%d\t", v1.colore, v2.colore, v2.valore, v1.valore);
 }
 
+/* stampa la combinazione finale della scacchiera con somme massime trovata */
 void stampa(board **m, int r, int c, int s)
 {
     int i, j;
 
     for (i = 0; i < r; i++) {
         for (j = 0; j < c; j++) {
+            // stampa ruotato o no in base al valore del campo
             if (m[i][j].ruotato)
                 stampa_val(m[i][j].c->val2, m[i][j].c->val1);
             else
@@ -218,17 +227,25 @@ void stampa(board **m, int r, int c, int s)
 
 void wrapper_powerset(cella_t c, board_t b, int n)
 {
-    // creazione matrice finale
+    /*
+     * creazione matrice finale, non del tipo board_t
+     * in quanto possiedo già le infomazioni di righe e colonne
+     * nella matrice che andrò ad utilizzare
+     */
     board **finale = malloc(b.r * sizeof(board));
     int i;
     for (i = 0; i < b.r; i++)
         finale[i] = malloc(b.c * sizeof(board));
     int somme = 0;
 
-    powerset(c, b, n, finale, &somme);
+    powerset(c, b, n, finale, &somme, 0, 0, 0);
 
     stampa(finale, b.r, b.c, somme);
 
+    // deallocazione board finale stampata
+    for (i = 0; i < b.r; i++)
+        free(finale[i]);
+    free(finale);
 }
 
 int main(int argc, char *argv[]) {

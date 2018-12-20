@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "utility.h"
 #include "invArray.h"
 #include "pgList.h"
 
@@ -91,7 +92,7 @@ void selezionaComando(comando_t e, TABPG tabPg, TABINV tabInv, int *f)
             break;
         case errore:
         default:
-            errore_comando("comando");
+            printf("Errore comando!\n");
             break;
     }
 }
