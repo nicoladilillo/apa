@@ -30,7 +30,7 @@ comandi_t leggiComando()
     char *comandi[errore] = {
             "acquisizione", "cerca titolo", "quotazione data",
             "quotazioni in intervallo date", "quotazioni massime e minime",
-            "partiziona albero", "esci"
+            "bilanciamento albero", "esci"
     };
 
     int i, cmd;

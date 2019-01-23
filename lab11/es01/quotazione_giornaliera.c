@@ -31,7 +31,7 @@ Quotazione QUOTAZIONEinit(float v, int n, Data d)
 {
     Quotazione q;
 
-    q.q = v/((float)n);
+    q.q = v;
     q.d = d;
     q.n = n;
     q.min = q.q;

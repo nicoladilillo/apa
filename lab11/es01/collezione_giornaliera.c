@@ -21,6 +21,7 @@ static link NEW(Quotazione q, link r, link l)
     x->item = q;
     x->r = r;
     x->l = l;
+    x->nodi = 1;
 
     return x;
 }
@@ -310,9 +311,10 @@ void COLLEZIONEpartition(Collezione bst)
     max = 0;
     int tot = 0;
     FindMinMaxCammino(bst->root, bst->z, &min, &max, 0, &tot);
+    /* se abbiamo un solo ramo */
     if (tot == 1)
         min = 0;
-    /* se sopra soglia effettua partizione */
+    /* se sopra soglia effettua partizione o se abbiamo un solo ramo*/
     if (min == 0 || (float)max/min > S) {
         int t;
         t = (bst->root->nodi)/2; // nodo che diventerà nuova radice
