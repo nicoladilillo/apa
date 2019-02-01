@@ -3,4 +3,4 @@ project(es01 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(es01 main.c graph.h graph.c st.h st.c)
+add_executable(es01 main.c graph.h graph.c st.h st.c item.h item.c)

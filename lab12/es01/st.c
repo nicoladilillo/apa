@@ -32,11 +32,15 @@ void STinsert(ST st, char *name) {
     st->m++;
 }
 
-int STsearchbyindex(ST st, char *name) {
+int STgetindex(ST st, char *name) {
     int i;
     for (i = 0; i < st->m; i++)
         if (strcmp(name, st->item[i]) == 0)
             return i;
 
     return -1;
+}
+
+char *STselect(ST st, int i) {
+    return st->item[i];
 }

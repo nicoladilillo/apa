@@ -3,16 +3,15 @@
 
 #include "graph.h"
 #include "st.h"
+#include "item.h"
 
 #define N 30+1
 
 typedef struct node* link;
 
 struct node {
-    int v;
-    int wt;
+    Item p;
     link next;
-    int preso; // serve per rimozione archi nella ricerca del DAG
 };
 
 struct graph_t {
@@ -24,13 +23,11 @@ struct graph_t {
     link z; // sentinella
 };
 
-static link NEW(int wt, int v, link next, int preso) {
+static link NEW(Item p, link next) {
     link x = malloc(sizeof *x);
 
     x->next = next;
-    x->v = v;
-    x->wt = wt;
-    x->preso = preso;
+    x->p = p;
 
     return x;
 }
@@ -38,7 +35,7 @@ static link NEW(int wt, int v, link next, int preso) {
 Graph GRAPHinit() {
     Graph G = (Graph)malloc(sizeof(Graph));
     G->E = 0;
-    G->z = NEW(-1, -1, NULL, 0);
+    G->z = NEW(ITEMsetnull(), NULL);
 
     return G;
 }
@@ -75,11 +72,11 @@ void GRAPHread(Graph G) {
     int wt, j;
     // lettura archi
     while (fscanf(fp, "%s %s %d\n", n1, n2, &wt) == 3) {
-        i = STsearchbyindex(G->st, n1);
-        j = STsearchbyindex(G->st, n2);
+        i = STgetindex(G->st, n1);
+        j = STgetindex(G->st, n2);
 
         // inserisci arco in lista delle adiacenze
-        G->ladj[i] = NEW(wt, j, G->ladj[i], 1);
+        G->ladj[i] = NEW(ITEMcreate(j, wt),G->ladj[i]);
         G->E++;
     }
 }
@@ -91,12 +88,12 @@ static void dfsR(Graph G, int *st, int *pre, int *post, int *time, int v, int w,
     st[w] = v;
     pre[w]= (*time)++;
     for(t = G->ladj[w]; t != G->z; t = t->next) {
-        if (!t->preso)
-            printf("(%d, %d) ", w, t->v);
-        else if(st[t->v] == -1)
-            dfsR(G, st, pre, post, time, w, t->v, f);
+        if (!t->p.preso)
+            printf("(%s, %s) ", STselect(G->st, w), STselect(G->st, t->p.v));
+        else if(st[t->p.v] == -1)
+            dfsR(G, st, pre, post, time, w, t->p.v, f);
         // identificazione arco backward per non far valere aciclicità
-        else if (post[t->v] == -1)
+        else if (post[t->p.v] == -1)
             *f = 0;
     }
 
@@ -129,7 +126,7 @@ static void GRAPHcopy(Graph G) {
 
     for (i = 0; i < G->V; i++)
         for (x = G->ladj[i], y = &G->DAG[i]; x != G->z; x = x->next) {
-            *y = NEW(x->wt, x->v, G->z, x->preso);
+            *y = NEW(x->p, G->z);
             y = &(*y)->next;
         }
 }
@@ -140,7 +137,7 @@ static void DAGcopy(Graph G) {
 
     for (i = 0; i < G->V; i++)
         for (x = G->ladj[i], y = G->DAG[i]; x != G->z; x = x->next, y = y->next)
-            y->preso = x->preso;
+            y->p.preso = x->p.preso;
 }
 
 static void combinazionisemplici(Graph G, int c, int cnt, link start, int v, int *f, int wt, int *wtmax, link z) {
@@ -167,10 +164,10 @@ static void combinazionisemplici(Graph G, int c, int cnt, link start, int v, int
         }
 
         // consideriamo quell'arco non preso
-        x->preso = 0;
+        x->p.preso = 0;
         // incrementiamo il contatore degli archi tolti
-        combinazionisemplici(G, c, cnt + 1, x->next, v, f, wt+x->wt, wtmax, z);
-        x->preso = 1;
+        combinazionisemplici(G, c, cnt + 1, x->next, v, f, wt+x->p.wt, wtmax, z);
+        x->p.preso = 1;
     }
 }
 
@@ -182,8 +179,8 @@ static void DAGstampa(Graph G) {
     printf("G \\ { ");
     for (i = 0; i < G->V; i++)
         for (x = G->DAG[i]; x != G->z; x = x->next)
-            if (!x->preso)
-                printf("(%d, %d) ", i, x->v);
+            if (!x->p.preso)
+                printf("(%s, %s) ", STselect(G->st, i), STselect(G->st, x->p.v));
 
             printf("}\n\n");
 }
@@ -194,9 +191,9 @@ static void calculateDistance(link *DAG, int *maxdist, int *st, link z, int ss) 
 
     for (i = ss; i >= 0; i--)
         for (x =  DAG[st[i]]; x != z; x = x->next)
-            if (x->preso)
-                if (maxdist[x->v] < maxdist[st[i]] + x->wt)
-                    maxdist[x->v] = maxdist[st[i]] + x->wt;
+            if (x->p.preso)
+                if (maxdist[x->p.v] < maxdist[st[i]] + x->p.wt)
+                    maxdist[x->p.v] = maxdist[st[i]] + x->p.wt;
 
 }
 
@@ -204,8 +201,8 @@ static void ordinamentoTopologico(link *DAG, int v, int *pre, int *st, int *time
     pre[v] = 0;
     link x;
     for (x = DAG[v]; x != z; x = x->next)
-        if(x->preso && pre[x->v] == -1)
-            ordinamentoTopologico(DAG, x->v, pre, st, time, z);
+        if(x->p.preso && pre[x->p.v] == -1)
+            ordinamentoTopologico(DAG, x->p.v, pre, st, time, z);
 
     st[(*time)++] = v;
 }
@@ -228,10 +225,10 @@ static void DAGmaxDistance(Graph G) {
     for (i = v-1; i >= 0; i--) {
         for (j = 0; j < G->V; j++) { maxdist[j] = 0; };
         calculateDistance(G->DAG, maxdist, st, G->z, i);
-        printf("Start: %d\n", st[i]);
+        printf("Start: %s\n", STselect(G->st, st[i]));
         for (j = 0; j < G->V; j++)
             if (j != st[i]) {
-                printf("\t-> %d [", j);
+                printf("\t-> %s [", STselect(G->st, j));
                 if (maxdist[j] == 0)
                     printf("non raggiungibile");
                 else
